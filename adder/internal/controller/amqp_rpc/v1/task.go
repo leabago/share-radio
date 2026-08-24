@@ -4,11 +4,11 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/evrone/go-clean-template/internal/controller/amqp_rpc/v1/request"
-	"github.com/evrone/go-clean-template/internal/controller/amqp_rpc/v1/response"
-	"github.com/evrone/go-clean-template/internal/entity"
-	"github.com/evrone/go-clean-template/pkg/rabbitmq/rmq_rpc/server"
 	"github.com/goccy/go-json"
+	"github.com/leabago/share-radio/adder/internal/controller/amqp_rpc/v1/request"
+	"github.com/leabago/share-radio/adder/internal/controller/amqp_rpc/v1/response"
+	"github.com/leabago/share-radio/adder/internal/entity"
+	"github.com/leabago/share-radio/adder/pkg/rabbitmq/rmq_rpc/server"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 

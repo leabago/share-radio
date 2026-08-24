@@ -56,3 +56,10 @@ func (t *Task) Transition(newStatus TaskStatus) error {
 
 	return ErrInvalidTransition
 }
+
+// TaskFilter -.
+type TaskFilter struct {
+	Status *TaskStatus
+	Limit  uint64
+	Offset uint64
+}

@@ -1,4 +1,4 @@
-package helper
+package functions
 
 func GetDefaultValue[T any](value *T) T { //nolint:ireturn
 	if value == nil {

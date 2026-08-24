@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/evrone/go-clean-template/pkg/jwt"
 	"github.com/gofiber/fiber/v2"
+	"github.com/leabago/share-radio/adder/pkg/jwt"
 )
 
 const _bearerParts = 2

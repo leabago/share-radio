@@ -1,11 +1,11 @@
 package v1
 
 import (
-	"github.com/evrone/go-clean-template/internal/usecase"
-	"github.com/evrone/go-clean-template/pkg/jwt"
-	"github.com/evrone/go-clean-template/pkg/logger"
-	"github.com/evrone/go-clean-template/pkg/nats/nats_rpc/server"
 	"github.com/go-playground/validator/v10"
+	"github.com/leabago/share-radio/adder/internal/usecase"
+	"github.com/leabago/share-radio/adder/pkg/jwt"
+	"github.com/leabago/share-radio/adder/pkg/logger"
+	"github.com/leabago/share-radio/adder/pkg/nats/nats_rpc/server"
 )
 
 // NewRoutes -.

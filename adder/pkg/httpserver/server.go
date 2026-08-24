@@ -6,14 +6,14 @@ import (
 	"errors"
 	"time"
 
-	"github.com/evrone/go-clean-template/pkg/logger"
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
+	"github.com/leabago/share-radio/adder/pkg/logger"
 	"golang.org/x/sync/errgroup"
 )
 
 const (
-	_defaultAddr            = ":80"
+	_defaultAddr            = ":8080"
 	_defaultReadTimeout     = 5 * time.Second
 	_defaultWriteTimeout    = 5 * time.Second
 	_defaultShutdownTimeout = 3 * time.Second

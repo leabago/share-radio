@@ -5,13 +5,13 @@ import (
 	"github.com/leabago/share-radio/adder/docs/gen"
 )
 
-type Genre struct {
+type Language struct {
 	Id   uuid.UUID
 	Name string
 }
 
-func (g Genre) ConvertToHttpGenre() gen.Genre {
-	return gen.Genre{
+func (g Language) ConvertToHttpLanguage() gen.Language {
+	return gen.Language{
 		Id:   new(g.Id),
 		Name: new(g.Name),
 	}

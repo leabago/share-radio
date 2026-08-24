@@ -19,8 +19,7 @@ services:
     container_name: rustfs-server
     depends_on:
       - volume-permission-helper
-    security_opt:
-      - "no-new-privileges:true"
+
     ports:
       - "9000:9000" # S3 API port
       - "9001:9001" # Console port
@@ -40,7 +39,7 @@ services:
       # - when TLS is enabled, health checks automatically switch to HTTPS
       # Keep strict disk topology checks enabled by default.
       # For local testing only, set `RUSTFS_UNSAFE_BYPASS_DISK_CHECK=true` explicitly.
-      - RUSTFS_UNSAFE_BYPASS_DISK_CHECK=${RUSTFS_UNSAFE_BYPASS_DISK_CHECK:-false}
+      - RUSTFS_UNSAFE_BYPASS_DISK_CHECK=true
 
     volumes:
       - rustfs_data_0:/data/rustfs0

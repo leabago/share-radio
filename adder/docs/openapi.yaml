@@ -1,0 +1,867 @@
+openapi: 3.0.1
+info:
+  title: Radio Station API
+  description: API for managing radio stations with ratings and plays
+  contact:
+    name: API Support
+    email: support@radioapp.com
+  version: '1.0'
+servers:
+  - url: http://localhost:8080
+    description: Development server
+  - url: https://api.radioapp.com
+    description: Production server
+
+paths:
+  /stations:
+    get:
+      tags:
+        - stations
+      summary: List radio stations
+      description: Get a list of radio stations with optional filters (Public - no auth required)
+      operationId: listStations
+      security: []  # No authentication required
+      parameters:
+        - name: limit
+          in: query
+          description: Number of stations to return
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: offset
+          in: query
+          description: Number of stations to skip
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: genre
+          in: query
+          description: Filter by genre
+          schema:
+            type: string
+            example: rock
+        - name: language
+          in: query
+          description: Filter by language
+          schema:
+            type: string
+            example: Russian
+        - name: sort_by
+          in: query
+          description: Sort results
+          schema:
+            type: string
+            enum:
+              - added_at
+              - name
+            default: name
+        - name: sort_order
+          in: query
+          description: Sort order
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: asc
+        - name: search
+          in: query
+          description: Search by name
+          schema:
+            type: string
+            example: rock
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StationListResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      tags:
+        - stations
+      summary: Create radio station
+      description: Add a new radio station to the database (Public - no auth required)
+      operationId: createStation
+      security: []  # No authentication required
+      requestBody:
+        description: Create radio station
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateStationRequest'
+      responses:
+        '201':
+          description: Station created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StationId'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: URL already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /stations/{id}:
+    get:
+      tags:
+        - stations
+      summary: Get radio station
+      description: Get a radio station by its UUID (Public - no auth required)
+      operationId: getStation
+      security: []  # No authentication required
+      parameters:
+        - name: id
+          in: path
+          description: Station UUID
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 550e8400-e29b-41d4-a716-446655440000
+      responses:
+        '200':
+          description: Station found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StationDetail'
+        '404':
+          description: Station not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      tags:
+        - admin
+      summary: Update radio station
+      description: Update station details (Admin only)
+      operationId: updateStation
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: Station UUID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        description: Updated station data
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateStationRequest'
+        required: true
+      responses:
+        '200':
+          description: Station updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Station'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - Admin only
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Station not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: URL already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      tags:
+        - admin
+      summary: Delete radio station
+      description: Delete a station by its UUID (Admin only)
+      operationId: deleteStation
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: Station UUID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Station deleted successfully
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - Admin only
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Station not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /stations/{id}/status:
+    patch:
+      tags:
+        - admin
+      summary: Update station status
+      description: Activate or deactivate a station (Admin only)
+      operationId: updateStationStatus
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: Station UUID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        description: New status
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateStatusRequest'
+        required: true
+      responses:
+        '200':
+          description: Status updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Station'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - Admin only
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Station not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /stations/{id}/play:
+    post:
+      tags:
+        - plays
+      summary: Record station play
+      description: Record that a user played a station (Public - no auth required)
+      operationId: recordPlay
+      security: []  # No authentication required
+      parameters:
+        - name: id
+          in: path
+          description: Station UUID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        description: Play session data
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecordPlayRequest'
+        required: true
+      responses:
+        '200':
+          description: Play recorded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlayResponse'
+        '404':
+          description: Station not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /stations/{id}/rate:
+    post:
+      tags:
+        - ratings
+      summary: Rate radio station
+      description: Rate a station (1-5 stars) and update popular_rating (Public - no auth required)
+      operationId: rateStation
+      security: []  # No authentication required
+      parameters:
+        - name: id
+          in: path
+          description: Station UUID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        description: Rating data
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RateStationRequest'
+        required: true
+      responses:
+        '200':
+          description: Rating submitted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RatingResponse'
+        '400':
+          description: Invalid rating value
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Station not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+
+  /stations/{id}/icon:
+    post:
+      tags:
+        - stations
+      summary: Uploading an icon for station.
+      description: Allows uploading a file along with additional metadata.
+      operationId: uploadIcon
+      security: []
+      parameters:
+        - name: id
+          in: path
+          description: Station UUID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: The file binary to upload
+      responses:
+        '200':
+          description: File uploaded successfully
+
+  /genres:
+    get:
+      tags:
+        - genres
+      summary: List genres
+      description: Get a list of genres
+      operationId: listGenres
+      security: []  # No authentication required
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenreList'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /languages:
+    get:
+      tags:
+        - languages
+      summary: List languages
+      description: Get a list of languages
+      operationId: listLanguages
+      security: []  # No authentication required
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LanguageList'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+
+components:
+  schemas:
+    AdminUser:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
+        username:
+          type: string
+          example: admin
+        email:
+          type: string
+          format: email
+          example: admin@radioapp.com
+        created_at:
+          type: string
+          format: date-time
+          example: 2026-01-01T00:00:00Z
+
+    RegisterRequest:
+      type: object
+      required:
+        - username
+        - email
+        - password
+      properties:
+        username:
+          type: string
+          minLength: 3
+          maxLength: 50
+          pattern: '^[a-zA-Z0-9_]+$'
+          example: admin
+        email:
+          type: string
+          format: email
+          example: admin@radioapp.com
+        password:
+          type: string
+          minLength: 6
+          maxLength: 100
+          example: securePassword123
+
+    LoginRequest:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          example: admin
+        password:
+          type: string
+          example: securePassword123
+
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        user:
+          $ref: '#/components/schemas/AdminUser'
+        expires_at:
+          type: string
+          format: date-time
+          example: 2026-01-02T00:00:00Z
+
+    Station:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
+        name:
+          type: string
+          example: Rock FM
+        url:
+          type: string
+          format: uri
+          example: https://radio.example.com/rockfm
+        genre:
+          type: string
+          example: Rock
+        language:
+          type: string
+          example: Russian
+        icon:
+          type: string
+        is_active:
+          type: boolean
+          example: true
+        is_new:
+          type: boolean
+          example: true
+        added_at:
+          type: string
+          format: date-time
+          example: 2026-01-01T00:00:00Z
+        updated_at:
+          type: string
+          format: date-time
+          example: 2026-01-01T00:00:00Z
+
+    StationId:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
+
+    StationDetail:
+      allOf:
+        - $ref: '#/components/schemas/Station'
+        - type: object
+          properties:
+            rating_distribution:
+              type: object
+              properties:
+                '1':
+                  type: integer
+                  example: 5
+                '2':
+                  type: integer
+                  example: 12
+                '3':
+                  type: integer
+                  example: 23
+                '4':
+                  type: integer
+                  example: 45
+                '5':
+                  type: integer
+                  example: 67
+            rating_count:
+              type: integer
+              example: 152
+            is_user_rated:
+              type: boolean
+              example: false
+
+    CreateStationRequest:
+      type: object
+      required:
+        - name
+        - url
+        - genre
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: Rock FM
+        url:
+          type: string
+          format: uri
+          minLength: 1
+          maxLength: 500
+          example: https://radio.example.com/rockfm
+        genre:
+          type: string
+          minLength: 1
+          maxLength: 50
+          example: rock
+        language:
+          type: string
+          maxLength: 50
+          example: Russian
+
+    UpdateStationRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: Rock FM
+        url:
+          type: string
+          format: uri
+          maxLength: 500
+          example: https://radio.example.com/rockfm-new
+        genre:
+          type: string
+          maxLength: 50
+          example: Classic Rock
+        country:
+          type: string
+          maxLength: 50
+          example: Russia
+        language:
+          type: string
+          maxLength: 50
+          example: Russian
+
+    UpdateStatusRequest:
+      type: object
+      required:
+        - is_active
+      properties:
+        is_active:
+          type: boolean
+          example: true
+
+    RecordPlayRequest:
+      type: object
+      required:
+        - session_id
+      properties:
+        session_id:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: session-abc123
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+          example: 4
+
+    RateStationRequest:
+      type: object
+      required:
+        - rating
+        - session_id
+      properties:
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+          example: 4
+        session_id:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: session-abc123
+
+    PlayResponse:
+      type: object
+      properties:
+        station_id:
+          type: string
+          format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
+        total_plays:
+          type: integer
+          example: 1235
+        popular_rating:
+          type: number
+          format: float
+          example: 4.35
+        played_at:
+          type: string
+          format: date-time
+          example: 2026-01-01T00:00:00Z
+
+    RatingResponse:
+      type: object
+      properties:
+        station_id:
+          type: string
+          format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
+        user_rating:
+          type: integer
+          example: 4
+        popular_rating:
+          type: number
+          format: float
+          example: 4.35
+        rating_count:
+          type: integer
+          example: 152
+
+    StationListResponse:
+      type: object
+      properties:
+        stations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Station'
+        total:
+          type: integer
+          example: 42
+        limit:
+          type: integer
+          example: 20
+        offset:
+          type: integer
+          example: 0
+
+    Genre:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
+        name:
+          type: string
+          example: rock
+
+    GenreList:
+      type: object
+      properties:
+        genres:
+          type: array
+          items:
+            $ref: '#/components/schemas/Genre'
+
+    Language:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
+        name:
+          type: string
+          example: English
+
+    LanguageList:
+      type: object
+      properties:
+        languages:
+          type: array
+          items:
+            $ref: '#/components/schemas/Language'
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: Invalid request parameters
+        code:
+          type: string
+          example: VALIDATION_ERROR
+        details:
+          type: object
+          additionalProperties: true
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token obtained from /auth/login
+
+security: []  # No default security, each endpoint defines its own

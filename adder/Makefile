@@ -37,7 +37,7 @@ compose-down: ### Down docker compose
 .PHONY: compose-down
 
 swag-v1: ### swag init
-	swag init --parseDependency -g internal/controller/restapi/router.go
+	#swag init --parseDependency -g internal/controller/restapi/router.go
 .PHONY: swag-v1
 
 proto-v1: ### generate source files from proto
@@ -115,3 +115,8 @@ bin-deps: ### install tools
 
 pre-commit: deps swag-v1 proto-v1 mock format linter-golangci test ### run pre-commit
 .PHONY: pre-commit
+
+
+read-env:
+	export $(grep -v '^#' .env.example | xargs)
+.PHONY: read-env

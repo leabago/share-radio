@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/evrone/go-clean-template/internal/entity"
-	"github.com/evrone/go-clean-template/internal/repo"
-	"github.com/evrone/go-clean-template/internal/usecase"
 	"github.com/google/uuid"
+	"github.com/leabago/share-radio/adder/internal/entity"
+	"github.com/leabago/share-radio/adder/internal/repo"
+	"github.com/leabago/share-radio/adder/internal/usecase"
 )
 
 // UseCase -.
@@ -63,7 +63,7 @@ func (uc *UseCase) List(ctx context.Context, userID string, status *entity.TaskS
 		offset = 0
 	}
 
-	tasks, total, err := uc.repo.List(ctx, userID, repo.TaskFilter{
+	tasks, total, err := uc.repo.List(ctx, userID, entity.TaskFilter{
 		Status: status,
 		Limit:  uint64(limit),
 		Offset: uint64(offset),

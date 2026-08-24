@@ -4,15 +4,15 @@ import (
 	"context"
 	"math"
 
-	"github.com/evrone/go-clean-template/internal/entity"
-	"github.com/evrone/go-clean-template/internal/repo"
+	"github.com/leabago/share-radio/adder/internal/entity"
+	"github.com/leabago/share-radio/adder/internal/repo"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
 )
 
-const _tracerName = "github.com/evrone/go-clean-template/internal/repo/persistent/task"
+const _tracerName = "github.com/leabago/share-radio/adder/internal/repo/persistent/task"
 
 // tracedRepo wraps a TaskRepo with OpenTelemetry spans on top of the
 // low-level pgx query spans, giving a semantic "TaskRepo.<Method>" view.
@@ -71,7 +71,7 @@ func (r *tracedRepo) GetByID(ctx context.Context, userID, taskID string) (entity
 	return result, err
 }
 
-func (r *tracedRepo) List(ctx context.Context, userID string, filter repo.TaskFilter) ([]entity.Task, int, error) {
+func (r *tracedRepo) List(ctx context.Context, userID string, filter entity.TaskFilter) ([]entity.Task, int, error) {
 	attrs := []attribute.KeyValue{
 		attribute.String("user.id", userID),
 		attribute.Int64("task.limit", safeUint64ToInt64(filter.Limit)),

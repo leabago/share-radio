@@ -8,28 +8,36 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/evrone/go-clean-template/config"
-	amqprpc "github.com/evrone/go-clean-template/internal/controller/amqp_rpc"
-	"github.com/evrone/go-clean-template/internal/controller/grpc"
-	grpcmw "github.com/evrone/go-clean-template/internal/controller/grpc/middleware"
-	natsrpc "github.com/evrone/go-clean-template/internal/controller/nats_rpc"
-	"github.com/evrone/go-clean-template/internal/controller/restapi"
-	persistTaskRepo "github.com/evrone/go-clean-template/internal/repo/persistent/task"
-	persistTranslationRepo "github.com/evrone/go-clean-template/internal/repo/persistent/translation"
-	persistUserRepo "github.com/evrone/go-clean-template/internal/repo/persistent/user"
-	"github.com/evrone/go-clean-template/internal/repo/webapi"
-	"github.com/evrone/go-clean-template/internal/usecase"
-	"github.com/evrone/go-clean-template/internal/usecase/task"
-	"github.com/evrone/go-clean-template/internal/usecase/translation"
-	"github.com/evrone/go-clean-template/internal/usecase/user"
-	"github.com/evrone/go-clean-template/pkg/grpcserver"
-	"github.com/evrone/go-clean-template/pkg/httpserver"
-	"github.com/evrone/go-clean-template/pkg/jwt"
-	"github.com/evrone/go-clean-template/pkg/logger"
-	natsRPCServer "github.com/evrone/go-clean-template/pkg/nats/nats_rpc/server"
-	"github.com/evrone/go-clean-template/pkg/postgres"
-	rmqRPCServer "github.com/evrone/go-clean-template/pkg/rabbitmq/rmq_rpc/server"
-	"github.com/evrone/go-clean-template/pkg/tracing"
+	"github.com/leabago/share-radio/adder/config"
+	amqprpc "github.com/leabago/share-radio/adder/internal/controller/amqp_rpc"
+	"github.com/leabago/share-radio/adder/internal/controller/grpc"
+	grpcmw "github.com/leabago/share-radio/adder/internal/controller/grpc/middleware"
+	"github.com/leabago/share-radio/adder/internal/controller/http_api"
+	natsrpc "github.com/leabago/share-radio/adder/internal/controller/nats_rpc"
+	"github.com/leabago/share-radio/adder/internal/usecase/genre"
+	"github.com/leabago/share-radio/adder/internal/usecase/language"
+	"github.com/leabago/share-radio/adder/internal/usecase/station"
+
+	persistGenreRepo "github.com/leabago/share-radio/adder/internal/repo/persistent/genre"
+	persistLanguageRepo "github.com/leabago/share-radio/adder/internal/repo/persistent/language"
+	persistStationRepo "github.com/leabago/share-radio/adder/internal/repo/persistent/station"
+
+	persistTaskRepo "github.com/leabago/share-radio/adder/internal/repo/persistent/task"
+	persistTranslationRepo "github.com/leabago/share-radio/adder/internal/repo/persistent/translation"
+	persistUserRepo "github.com/leabago/share-radio/adder/internal/repo/persistent/user"
+	"github.com/leabago/share-radio/adder/internal/repo/webapi"
+	"github.com/leabago/share-radio/adder/internal/usecase"
+	"github.com/leabago/share-radio/adder/internal/usecase/task"
+	"github.com/leabago/share-radio/adder/internal/usecase/translation"
+	"github.com/leabago/share-radio/adder/internal/usecase/user"
+	"github.com/leabago/share-radio/adder/pkg/grpcserver"
+	"github.com/leabago/share-radio/adder/pkg/httpserver"
+	"github.com/leabago/share-radio/adder/pkg/jwt"
+	"github.com/leabago/share-radio/adder/pkg/logger"
+	natsRPCServer "github.com/leabago/share-radio/adder/pkg/nats/nats_rpc/server"
+	"github.com/leabago/share-radio/adder/pkg/postgres"
+	rmqRPCServer "github.com/leabago/share-radio/adder/pkg/rabbitmq/rmq_rpc/server"
+	"github.com/leabago/share-radio/adder/pkg/tracing"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	pbgrpc "google.golang.org/grpc"
 )
@@ -38,6 +46,9 @@ type useCases struct {
 	translation usecase.Translation
 	user        usecase.User
 	task        usecase.Task
+	station     usecase.Station
+	genre       usecase.Genre
+	language    usecase.Language
 }
 
 type servers struct {
@@ -51,11 +62,17 @@ func initUseCases(pg *postgres.Postgres, jwtManager *jwt.Manager) useCases {
 	translationRepo := persistTranslationRepo.New(pg)
 	taskRepo := persistTaskRepo.New(pg)
 	userRepo := persistUserRepo.New(pg)
+	stationRepo := persistStationRepo.New(pg)
+	genreRepo := persistGenreRepo.New(pg)
+	languageRepo := persistLanguageRepo.New(pg)
 
 	return useCases{
 		user:        user.New(userRepo, jwtManager),
 		task:        task.New(taskRepo),
 		translation: translation.New(translationRepo, webapi.New()),
+		station:     station.New(stationRepo),
+		genre:       genre.New(genreRepo),
+		language:    language.New(languageRepo),
 	}
 }
 
@@ -89,7 +106,7 @@ func initServers(cfg *config.Config, uc useCases, jwtManager *jwt.Manager, l log
 
 	// HTTP Server
 	httpServer := httpserver.New(l, httpserver.Port(cfg.HTTP.Port), httpserver.Prefork(cfg.HTTP.UsePreforkMode))
-	restapi.NewRouter(httpServer.App, cfg, uc.translation, uc.user, uc.task, jwtManager, l)
+	http_api.NewRouter(httpServer.App, cfg, uc.station, uc.genre, uc.language, jwtManager, l)
 
 	return servers{
 		rmq:  rmqServer,
@@ -104,6 +121,7 @@ func (s *servers) startServers() {
 	s.nats.Start()
 	s.grpc.Start()
 	s.http.Start()
+
 }
 
 func (s *servers) waitForShutdown(l logger.Interface) {

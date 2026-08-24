@@ -7,10 +7,10 @@ import (
 	"fmt"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/evrone/go-clean-template/internal/entity"
-	"github.com/evrone/go-clean-template/internal/repo"
-	"github.com/evrone/go-clean-template/pkg/postgres"
 	"github.com/jackc/pgx/v5"
+	"github.com/leabago/share-radio/adder/internal/entity"
+	"github.com/leabago/share-radio/adder/internal/repo"
+	"github.com/leabago/share-radio/adder/pkg/postgres"
 )
 
 // Repo -.
@@ -73,7 +73,7 @@ func (r *Repo) GetByID(ctx context.Context, userID, taskID string) (entity.Task,
 }
 
 // List -.
-func (r *Repo) List(ctx context.Context, userID string, filter repo.TaskFilter) ([]entity.Task, int, error) {
+func (r *Repo) List(ctx context.Context, userID string, filter entity.TaskFilter) ([]entity.Task, int, error) {
 	countBuilder := r.Builder.
 		Select("COUNT(*)").
 		From("tasks").

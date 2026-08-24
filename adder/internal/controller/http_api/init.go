@@ -4,20 +4,22 @@ import (
 	"net/http"
 
 	"github.com/ansrivas/fiberprometheus/v2"
-	"github.com/evrone/go-clean-template/config"
-	"github.com/evrone/go-clean-template/docs"
-	"github.com/evrone/go-clean-template/docs/gen"
-	"github.com/evrone/go-clean-template/internal/controller/http-api/api"
-	"github.com/evrone/go-clean-template/internal/controller/http-api/middleware"
+	"github.com/leabago/share-radio/adder/config"
+	"github.com/leabago/share-radio/adder/docs"
+	"github.com/leabago/share-radio/adder/docs/gen"
+	"github.com/leabago/share-radio/adder/internal/controller/http_api/api"
+	"github.com/leabago/share-radio/adder/internal/controller/http_api/middleware"
 
-	"github.com/evrone/go-clean-template/internal/usecase"
-	"github.com/evrone/go-clean-template/pkg/jwt"
-	"github.com/evrone/go-clean-template/pkg/logger"
 	"github.com/gofiber/contrib/swagger"
 	"github.com/gofiber/fiber/v2"
+	"github.com/leabago/share-radio/adder/internal/usecase"
+	"github.com/leabago/share-radio/adder/pkg/jwt"
+	"github.com/leabago/share-radio/adder/pkg/logger"
 )
 
-func NewRouter(app *fiber.App, cfg *config.Config, t usecase.Translation, u usecase.User, tk usecase.Task, jwtManager *jwt.Manager, l logger.Interface) {
+func NewRouter(app *fiber.App, cfg *config.Config,
+	station usecase.Station, genre usecase.Genre, language usecase.Language,
+	jwtManager *jwt.Manager, l logger.Interface) {
 	// Options
 	app.Use(middleware.Logger(l))
 	app.Use(middleware.Recovery(l))
@@ -37,7 +39,7 @@ func NewRouter(app *fiber.App, cfg *config.Config, t usecase.Translation, u usec
 			FileContent: docs.ApiSchema,
 			Path:        "swagger",
 
-			//CacheAge: 1,
+			CacheAge: 1,
 		}))
 
 	}
@@ -46,7 +48,7 @@ func NewRouter(app *fiber.App, cfg *config.Config, t usecase.Translation, u usec
 	app.Get("/healthz", func(ctx *fiber.Ctx) error { return ctx.SendStatus(http.StatusOK) })
 
 	// Routers
-	bffController := api.NewController(u)
+	bffController := api.NewController(station, genre, language)
 	wrappedHandler := gen.NewStrictHandler(bffController, nil)
 	gen.RegisterHandlers(app, wrappedHandler)
 

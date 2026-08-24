@@ -1,4 +1,4 @@
-package genre
+package language
 
 import (
 	"context"
@@ -7,33 +7,31 @@ import (
 	"github.com/leabago/share-radio/adder/internal/repo"
 )
 
-// UseCase -.
-type GenreCase struct {
-	repo repo.GenreRepo
+type LanguageCase struct {
+	repo repo.LanguageRepo
 }
 
-// New returns a Task usecase instrumented with OpenTelemetry tracing spans.
-func New(r repo.GenreRepo) *GenreCase {
-	return &GenreCase{
+func New(r repo.LanguageRepo) *LanguageCase {
+	return &LanguageCase{
 		repo: r,
 	}
 }
 
-func (g *GenreCase) ListGenres(ctx context.Context, request gen.ListGenresRequestObject) (gen.GenreList, error) {
+func (g *LanguageCase) ListLanguages(ctx context.Context, request gen.ListLanguagesRequestObject) (gen.LanguageList, error) {
 
-	allGenres, err := g.repo.ListGenres(ctx)
+	allLanguages, err := g.repo.ListLanguages(ctx)
 	if err != nil {
-		return gen.GenreList{}, err
+		return gen.LanguageList{}, err
 	}
 
-	genres := make([]gen.Genre, len(allGenres))
+	languages := make([]gen.Language, len(allLanguages))
 
-	for i, genre := range allGenres {
-		genres[i] = genre.ConvertToHttpGenre()
+	for i, language := range allLanguages {
+		languages[i] = language.ConvertToHttpLanguage()
 	}
 
-	resp := gen.GenreList{
-		Genres: &genres,
+	resp := gen.LanguageList{
+		Languages: &languages,
 	}
 
 	return resp, nil

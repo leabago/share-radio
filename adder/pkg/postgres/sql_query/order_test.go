@@ -1,8 +1,10 @@
-package sql
+package sql_query
 
 import (
+	"fmt"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -47,4 +49,20 @@ func TestOrder(t *testing.T) {
 			require.Equal(t, tt.wantSQL, gotSQL)
 		})
 	}
+}
+
+func TestSortOrderOk(t *testing.T) {
+	order := "ASC"
+	so, err := ParseSortOrder(order)
+	require.NoError(t, err)
+	assert.True(t, so.IsValid())
+}
+
+func TestSortOrderNotCorrect(t *testing.T) {
+	order := "ASC2"
+	_, err := ParseSortOrder(order)
+	require.Error(t, err)
+
+	assert.EqualError(t, err, fmt.Sprintf("invalid SortOrder: %s", order))
+
 }

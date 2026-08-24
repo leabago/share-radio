@@ -1,10 +1,12 @@
 version: '3'
 
+dotenv: ['.env', '{{.ENV}}/.env', '.env.example']
+
 tasks:
   default:
-    desc: Run golangci-lint
+    desc: Run app
     cmds:
-      - task: lint
+      - task: run
 
   lint:
     desc: Run golangci-lint
@@ -15,16 +17,6 @@ tasks:
     desc: Run golangci-lint with autofix
     cmds:
       - GOWORK=off golangci-lint run -v --fix
-
-  lint-ci:
-    desc: Run golangci-lint for CI pipeline
-    cmds:
-      - golangci-lint run -v --concurrency=1
-
-  lint-fast:
-    desc: Run fast lint check
-    cmds:
-      - GOWORK=off golangci-lint run --fast-only
 
   lint-install-latest:
     desc: Install golangci-lint
@@ -77,21 +69,15 @@ tasks:
       
         rm coverage.out
 
-  swag:
-    desc: Run swag init command
+  generate:
+    desc: Run generate command
     cmds:
-      - swag init --parseGoList --parseDependency --parseInternal
+      - go get github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen
+      - go generate ./...
 
   run:
     desc: Run go app
     cmds:
       - go mod tidy
-      - go run main.go -d true
-
-
-  mockgen:
-    desc: Run gen mock wfm, acess
-    cmds:
-      - mockgen -source=pkgs_go/controllers/grpc/wfm/wfm_grpc.pb.go  -destination=pkgs_go/mocks/grpc/wfm/wfm_grpc_mock.go  -package=wfm
-      - mockgen -source=pkgs_go/controllers/grpc/access/access_grpc.pb.go  -destination=pkgs_go/mocks/grpc/access/access_grpc_mock.go  -package=access
+      - go run ./cmd/app/
 

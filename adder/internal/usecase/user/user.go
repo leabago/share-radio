@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/evrone/go-clean-template/internal/entity"
-	"github.com/evrone/go-clean-template/internal/repo"
-	"github.com/evrone/go-clean-template/internal/usecase"
-	"github.com/evrone/go-clean-template/pkg/jwt"
 	"github.com/google/uuid"
+	"github.com/leabago/share-radio/adder/internal/entity"
+	"github.com/leabago/share-radio/adder/internal/repo"
+	"github.com/leabago/share-radio/adder/internal/usecase"
+	"github.com/leabago/share-radio/adder/pkg/jwt"
 	"golang.org/x/crypto/bcrypt"
 )
 

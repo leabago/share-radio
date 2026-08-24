@@ -4,7 +4,8 @@ package repo
 import (
 	"context"
 
-	"github.com/evrone/go-clean-template/internal/entity"
+	"github.com/leabago/share-radio/adder/docs/gen"
+	"github.com/leabago/share-radio/adder/internal/entity"
 )
 
 //go:generate mockgen -source=contracts.go -destination=../usecase/mocks_repo_test.go -package=usecase_test
@@ -32,15 +33,22 @@ type (
 	TaskRepo interface {
 		Store(ctx context.Context, task *entity.Task) error
 		GetByID(ctx context.Context, userID, taskID string) (entity.Task, error)
-		List(ctx context.Context, userID string, filter TaskFilter) ([]entity.Task, int, error)
+		List(ctx context.Context, userID string, filter entity.TaskFilter) ([]entity.Task, int, error)
 		Update(ctx context.Context, task *entity.Task) error
 		Delete(ctx context.Context, userID, taskID string) error
 	}
 
-	// TaskFilter -.
-	TaskFilter struct {
-		Status *entity.TaskStatus
-		Limit  uint64
-		Offset uint64
+	StationRepo interface {
+		CreateStation(ctx context.Context, station *entity.Station) (string, error)
+		ListStations(ctx context.Context, request gen.ListStationsRequestObject) ([]entity.Station, error)
+		GetStation(ctx context.Context, id string) (entity.Station, error)
+	}
+
+	GenreRepo interface {
+		ListGenres(ctx context.Context) ([]entity.Genre, error)
+	}
+
+	LanguageRepo interface {
+		ListLanguages(ctx context.Context) ([]entity.Language, error)
 	}
 )

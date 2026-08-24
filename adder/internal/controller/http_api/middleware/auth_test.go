@@ -7,9 +7,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/evrone/go-clean-template/internal/controller/http/middleware"
-	"github.com/evrone/go-clean-template/pkg/jwt"
 	"github.com/gofiber/fiber/v2"
+	"github.com/leabago/share-radio/adder/internal/controller/http_api/middleware"
+	"github.com/leabago/share-radio/adder/pkg/jwt"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

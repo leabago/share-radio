@@ -3,9 +3,9 @@ package v1
 import (
 	"fmt"
 
-	"github.com/evrone/go-clean-template/internal/controller/nats_rpc/v1/request"
-	"github.com/evrone/go-clean-template/pkg/jwt"
 	"github.com/goccy/go-json"
+	"github.com/leabago/share-radio/adder/internal/controller/nats_rpc/v1/request"
+	"github.com/leabago/share-radio/adder/pkg/jwt"
 	"github.com/nats-io/nats.go"
 )
 

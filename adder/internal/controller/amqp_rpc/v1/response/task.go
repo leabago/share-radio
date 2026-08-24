@@ -1,6 +1,6 @@
 package response
 
-import "github.com/evrone/go-clean-template/internal/entity"
+import "github.com/leabago/share-radio/adder/internal/entity"
 
 // TaskList -.
 type TaskList struct {

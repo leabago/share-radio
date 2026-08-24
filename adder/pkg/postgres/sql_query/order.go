@@ -1,16 +1,32 @@
-package sql
+package sql_query
 
 import (
 	"fmt"
 	"strings"
 )
 
-type SortDirection string
+type SortOrder string
 
 const (
-	Asc  SortDirection = "ASC"
-	Desc SortDirection = "DESC"
+	Asc  SortOrder = "ASC"
+	Desc SortOrder = "DESC"
 )
+
+func (s SortOrder) IsValid() bool {
+	switch s {
+	case Asc, Desc:
+		return true
+	}
+	return false
+}
+
+func ParseSortOrder(s string) (SortOrder, error) {
+	status := SortOrder(strings.ToUpper(s))
+	if status.IsValid() {
+		return status, nil
+	}
+	return "", fmt.Errorf("invalid SortOrder: %s", s)
+}
 
 type OrderCondition struct {
 	parts []string
@@ -20,7 +36,7 @@ func NewOrder() *OrderCondition {
 	return &OrderCondition{}
 }
 
-func (o *OrderCondition) OrderBy(field string, direction SortDirection, nulls bool) *OrderCondition {
+func (o *OrderCondition) OrderBy(field string, direction SortOrder, nulls bool) *OrderCondition {
 	var nullStr string
 	if nulls {
 		nullStr = " NULLS FIRST"

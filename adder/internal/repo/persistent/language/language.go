@@ -1,4 +1,4 @@
-package genre
+package language
 
 import (
 	"context"
@@ -11,7 +11,7 @@ import (
 
 const selectGenres = `
 SELECT id, "name"
-FROM public.genres
+FROM public.languages
 `
 
 type Repo struct {
@@ -24,7 +24,7 @@ func New(pg *postgres.Postgres) *Repo {
 	}
 }
 
-func (r *Repo) ListGenres(ctx context.Context) ([]entity.Genre, error) {
+func (r *Repo) ListLanguages(ctx context.Context) ([]entity.Language, error) {
 
 	order := sql_query.NewOrder().OrderBy("display_order", sql_query.Asc, false).SQL()
 
@@ -38,7 +38,7 @@ func (r *Repo) ListGenres(ctx context.Context) ([]entity.Genre, error) {
 		return nil, err
 	}
 
-	genre, err := pgx.CollectRows(row, pgx.RowToStructByName[entity.Genre])
+	genre, err := pgx.CollectRows(row, pgx.RowToStructByName[entity.Language])
 	if err != nil {
 		return nil, err
 	}

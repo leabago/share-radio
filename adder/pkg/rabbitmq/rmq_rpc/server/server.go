@@ -7,9 +7,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/evrone/go-clean-template/pkg/logger"
-	rmqrpc "github.com/evrone/go-clean-template/pkg/rabbitmq/rmq_rpc"
 	"github.com/goccy/go-json"
+	"github.com/leabago/share-radio/adder/pkg/logger"
+	rmqrpc "github.com/leabago/share-radio/adder/pkg/rabbitmq/rmq_rpc"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"

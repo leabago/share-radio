@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	grpcmw "github.com/evrone/go-clean-template/internal/controller/grpc/middleware"
-	"github.com/evrone/go-clean-template/pkg/jwt"
+	grpcmw "github.com/leabago/share-radio/adder/internal/controller/grpc/middleware"
+	"github.com/leabago/share-radio/adder/pkg/jwt"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"

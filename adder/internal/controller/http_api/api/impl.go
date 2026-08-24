@@ -2,120 +2,107 @@ package api
 
 import (
 	"context"
-	"fmt"
 
-	"github.com/evrone/go-clean-template/docs/gen"
+	"github.com/leabago/share-radio/adder/docs/gen"
+	"github.com/leabago/share-radio/adder/internal/usecase"
 )
 
-func errUnhandled(err error) gen.V1Error {
-	return gen.V1Error{
+func errUnhandled(err error) gen.ErrorResponse {
+	return gen.ErrorResponse{
 		Error: new(err.Error()),
 	}
-}
-
-type UserService interface {
-	LoginV2(ctx context.Context, request gen.LoginRequestObject) (gen.V1Token, error)
 }
 
 var _ gen.StrictServerInterface = (*Controller)(nil)
 
 type Controller struct {
-	userService UserService
+	stationService  usecase.Station
+	genreService    usecase.Genre
+	languageService usecase.Language
 }
 
-func NewController(userService UserService) Controller {
+func NewController(stationsService usecase.Station, genresService usecase.Genre, languageService usecase.Language) Controller {
 	return Controller{
-		userService: userService,
+		stationService:  stationsService,
+		genreService:    genresService,
+		languageService: languageService,
 	}
 }
 
-func (c Controller) Login(ctx context.Context, request gen.LoginRequestObject) (gen.LoginResponseObject, error) {
-
-	resp, err := c.userService.LoginV2(ctx, request)
-
+func (c Controller) ListStations(ctx context.Context, request gen.ListStationsRequestObject) (gen.ListStationsResponseObject, error) {
+	resp, err := c.stationService.ListStations(ctx, request)
 	if err != nil {
-		return gen.Login500JSONResponse(errUnhandled(err)), nil
+		return gen.ListStations500JSONResponse(errUnhandled(err)), nil
 	}
 
-	return gen.Login200JSONResponse(resp), nil
+	return gen.ListStations200JSONResponse(resp), nil
+}
+
+func (c Controller) CreateStation(ctx context.Context, request gen.CreateStationRequestObject) (gen.CreateStationResponseObject, error) {
+
+	resp, err := c.stationService.CreateStation(ctx, request)
+	if err != nil {
+		return gen.CreateStation500JSONResponse(errUnhandled(err)), nil
+	}
+
+	return gen.CreateStation201JSONResponse(resp), nil
 
 }
 
-func (c Controller) Register(ctx context.Context, request gen.RegisterRequestObject) (gen.RegisterResponseObject, error) {
+func (c Controller) DeleteStation(ctx context.Context, request gen.DeleteStationRequestObject) (gen.DeleteStationResponseObject, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (c Controller) ListTasks(ctx context.Context, request gen.ListTasksRequestObject) (gen.ListTasksResponseObject, error) {
+func (c Controller) GetStation(ctx context.Context, request gen.GetStationRequestObject) (gen.GetStationResponseObject, error) {
+	resp, err := c.stationService.GetStation(ctx, request)
+	if err != nil {
+		return gen.GetStation500JSONResponse(errUnhandled(err)), nil
+	}
 
-	fmt.Println("ListTasks middleware")
-
-	return gen.ListTasks200JSONResponse{}, nil
+	return gen.GetStation200JSONResponse(resp), nil
 }
 
-func (c Controller) CreateTask(ctx context.Context, request gen.CreateTaskRequestObject) (gen.CreateTaskResponseObject, error) {
+func (c Controller) UpdateStation(ctx context.Context, request gen.UpdateStationRequestObject) (gen.UpdateStationResponseObject, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (c Controller) DeleteTask(ctx context.Context, request gen.DeleteTaskRequestObject) (gen.DeleteTaskResponseObject, error) {
+func (c Controller) RecordPlay(ctx context.Context, request gen.RecordPlayRequestObject) (gen.RecordPlayResponseObject, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (c Controller) GetTask(ctx context.Context, request gen.GetTaskRequestObject) (gen.GetTaskResponseObject, error) {
+func (c Controller) RateStation(ctx context.Context, request gen.RateStationRequestObject) (gen.RateStationResponseObject, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (c Controller) UpdateTask(ctx context.Context, request gen.UpdateTaskRequestObject) (gen.UpdateTaskResponseObject, error) {
+func (c Controller) UpdateStationStatus(ctx context.Context, request gen.UpdateStationStatusRequestObject) (gen.UpdateStationStatusResponseObject, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (c Controller) TransitionTask(ctx context.Context, request gen.TransitionTaskRequestObject) (gen.TransitionTaskResponseObject, error) {
+func (c Controller) ListGenres(ctx context.Context, request gen.ListGenresRequestObject) (gen.ListGenresResponseObject, error) {
+
+	resp, err := c.genreService.ListGenres(ctx, request)
+	if err != nil {
+		return gen.ListGenres500JSONResponse(errUnhandled(err)), nil
+	}
+
+	return gen.ListGenres200JSONResponse(resp), nil
+}
+
+func (c Controller) ListLanguages(ctx context.Context, request gen.ListLanguagesRequestObject) (gen.ListLanguagesResponseObject, error) {
+	resp, err := c.languageService.ListLanguages(ctx, request)
+	if err != nil {
+		return gen.ListLanguages500JSONResponse(errUnhandled(err)), nil
+	}
+
+	return gen.ListLanguages200JSONResponse(resp), nil
+}
+
+func (c Controller) UploadIcon(ctx context.Context, request gen.UploadIconRequestObject) (gen.UploadIconResponseObject, error) {
 	//TODO implement me
 	panic("implement me")
 }
-
-func (c Controller) DoTranslate(ctx context.Context, request gen.DoTranslateRequestObject) (gen.DoTranslateResponseObject, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (c Controller) History(ctx context.Context, request gen.HistoryRequestObject) (gen.HistoryResponseObject, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (c Controller) Profile(ctx context.Context, request gen.ProfileRequestObject) (gen.ProfileResponseObject, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
-//
-//func NewBffController(bffService BffService) BffController {
-//	return BffController{
-//		bffService: bffService,
-//	}
-//}
-//
-//func (b BffController) PostApiHolidays(
-//	ctx context.Context, request gen.PostApiHolidaysRequestObject) (gen.PostApiHolidaysResponseObject, error) {
-//
-//	resp, err := b.bffService.GetHolidays(ctx)
-//	if err != nil {
-//		return gen.PostApiHolidays500JSONResponse(errUnhandled(err)), nil
-//	}
-//
-//	return gen.PostApiHolidays200JSONResponse(resp), nil
-//}
-//
-//func (b BffController) GetApiMainHealthCheck(
-//	ctx context.Context, request gen.GetApiMainHealthCheckRequestObject) (gen.GetApiMainHealthCheckResponseObject, error) {
-//	resp := gen.HealthCheckResponse{
-//		Status: "OK",
-//	}
-//
-//	return gen.GetApiMainHealthCheck200JSONResponse(resp), nil
-//}
