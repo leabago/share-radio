@@ -1,0 +1,6 @@
+# yaml-language-server: ...
+package: gen
+generate:
+  fiber-server: true
+  strict-server: true
+output: server.gen.go

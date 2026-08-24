@@ -1,0 +1,97 @@
+version: '3'
+
+tasks:
+  default:
+    desc: Run golangci-lint
+    cmds:
+      - task: lint
+
+  lint:
+    desc: Run golangci-lint
+    cmds:
+      - GOWORK=off golangci-lint run -v
+
+  lint-fix:
+    desc: Run golangci-lint with autofix
+    cmds:
+      - GOWORK=off golangci-lint run -v --fix
+
+  lint-ci:
+    desc: Run golangci-lint for CI pipeline
+    cmds:
+      - golangci-lint run -v --concurrency=1
+
+  lint-fast:
+    desc: Run fast lint check
+    cmds:
+      - GOWORK=off golangci-lint run --fast-only
+
+  lint-install-latest:
+    desc: Install golangci-lint
+    cmds:
+      - curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b {{.GOPATH}}/bin
+      - golangci-lint --version
+
+  lint-install:
+    desc: Installs golangci-lint with the specified version.
+    cmds:
+      - curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v2.10.1
+      - golangci-lint --version
+
+  lint-verify:
+    desc: Verify configuration
+    cmds:
+      - golangci-lint config verify
+
+  install-test-tool:
+    desc: Install test tools
+    cmds:
+      - go install github.com/boumenot/gocover-cobertura@latest
+      - go install gotest.tools/gotestsum@latest
+
+  test:
+    desc: Run unit tests
+    cmds:
+      - gotestsum --format testname -- -race -timeout=10m ./...
+
+  test-report:
+    desc: Run unit tests
+    cmds:
+      - |
+        set +e
+        gotestsum \
+        --format testname \
+        -- \
+        -race \
+        -coverprofile=coverage.out \
+        -covermode=atomic \
+        -timeout=10m \
+        ./...
+        set -e
+        
+        go tool cover -func=coverage.out
+        go tool cover -html=coverage.out -o coverage.html
+        
+        COVERAGE_PERCENT=$(go tool cover -func=coverage.out | grep total | awk '{print $3}' | sed 's/%//')
+        echo "📊  Coverage $COVERAGE_PERCENT %"
+      
+        rm coverage.out
+
+  swag:
+    desc: Run swag init command
+    cmds:
+      - swag init --parseGoList --parseDependency --parseInternal
+
+  run:
+    desc: Run go app
+    cmds:
+      - go mod tidy
+      - go run main.go -d true
+
+
+  mockgen:
+    desc: Run gen mock wfm, acess
+    cmds:
+      - mockgen -source=pkgs_go/controllers/grpc/wfm/wfm_grpc.pb.go  -destination=pkgs_go/mocks/grpc/wfm/wfm_grpc_mock.go  -package=wfm
+      - mockgen -source=pkgs_go/controllers/grpc/access/access_grpc.pb.go  -destination=pkgs_go/mocks/grpc/access/access_grpc_mock.go  -package=access
+

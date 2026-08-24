@@ -1,0 +1,5 @@
+# yaml-language-server: ...
+package: gen
+generate:
+  models: true
+output: types.gen.go
