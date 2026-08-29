@@ -38,7 +38,7 @@ type (
 	Station interface {
 		CreateStation(ctx context.Context, request gen.CreateStationRequestObject) (gen.StationId, error)
 		ListStations(ctx context.Context, request gen.ListStationsRequestObject) (gen.StationListResponse, error)
-		GetStation(ctx context.Context, request gen.GetStationRequestObject) (gen.StationDetail, error)
+		GetStation(ctx context.Context, request gen.GetStationRequestObject) (gen.Station, error)
 	}
 
 	Genre interface {

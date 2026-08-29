@@ -128,18 +128,18 @@ func (siw *ServerInterfaceWrapper) ListStations(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter offset: %w", err).Error())
 	}
 
-	// ------------- Optional query parameter "genre" -------------
+	// ------------- Optional query parameter "genreId" -------------
 
-	err = runtime.BindQueryParameterWithOptions("form", true, false, "genre", query, &params.Genre, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "genreId", query, &params.GenreId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
 	if err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter genre: %w", err).Error())
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter genreId: %w", err).Error())
 	}
 
-	// ------------- Optional query parameter "language" -------------
+	// ------------- Optional query parameter "languageId" -------------
 
-	err = runtime.BindQueryParameterWithOptions("form", true, false, "language", query, &params.Language, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "languageId", query, &params.LanguageId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
 	if err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter language: %w", err).Error())
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter languageId: %w", err).Error())
 	}
 
 	// ------------- Optional query parameter "sort_by" -------------
@@ -635,7 +635,7 @@ type GetStationResponseObject interface {
 	VisitGetStationResponse(ctx *fiber.Ctx) error
 }
 
-type GetStation200JSONResponse StationDetail
+type GetStation200JSONResponse Station
 
 func (response GetStation200JSONResponse) VisitGetStationResponse(ctx *fiber.Ctx) error {
 	ctx.Response().Header.Set("Content-Type", "application/json")

@@ -9,9 +9,9 @@ import (
 	"github.com/leabago/share-radio/adder/pkg/postgres/sql_query"
 )
 
-const selectGenres = `
-SELECT id, "name"
-FROM public.languages
+const selectLanguages = `
+SELECT "id", "name"
+FROM stations.languages
 `
 
 type Repo struct {
@@ -28,20 +28,47 @@ func (r *Repo) ListLanguages(ctx context.Context) ([]entity.Language, error) {
 
 	order := sql_query.NewOrder().OrderBy("display_order", sql_query.Asc, false).SQL()
 
-	selectGenresReq := selectGenres + order
+	request := selectLanguages + order
 
-	row, err := r.Postgres.Pool.Query(
+	rows, err := r.Postgres.Pool.Query(
 		ctx,
-		selectGenresReq,
+		request,
 	)
 	if err != nil {
 		return nil, err
 	}
 
-	genre, err := pgx.CollectRows(row, pgx.RowToStructByName[entity.Language])
+	languages, err := pgx.CollectRows(rows, pgx.RowToStructByName[entity.Language])
 	if err != nil {
 		return nil, err
 	}
 
-	return genre, nil
+	return languages, nil
 }
+
+//
+//func (r *Repo) GetLanguageByName(ctx context.Context, name string) (*entity.Language, error) {
+//
+//	where, args := sql_query.NewWhere().And("name = ?", name).SQL()
+//
+//	request := selectLanguages + where
+//
+//	rows, err := r.Postgres.Pool.Query(
+//		ctx,
+//		request,
+//		args,
+//	)
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	language, err := pgx.CollectOneRow(rows, pgx.RowToStructByName[entity.Language])
+//	if err != nil {
+//		if errors.Is(err, pgx.ErrNoRows) {
+//			return nil, entity.ErrNotFound
+//		}
+//		return nil, err
+//	}
+//
+//	return &language, nil
+//}

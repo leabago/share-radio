@@ -11,7 +11,6 @@ import (
 	gomock "github.com/golang/mock/gomock"
 	gen "github.com/leabago/share-radio/adder/docs/gen"
 	entity "github.com/leabago/share-radio/adder/internal/entity"
-	repo "github.com/leabago/share-radio/adder/internal/repo"
 )
 
 // MockTranslationRepo is a mock of TranslationRepo interface.
@@ -224,7 +223,7 @@ func (mr *MockTaskRepoMockRecorder) GetByID(ctx, userID, taskID interface{}) *go
 }
 
 // List mocks base method.
-func (m *MockTaskRepo) List(ctx context.Context, userID string, filter repo.TaskFilter) ([]entity.Task, int, error) {
+func (m *MockTaskRepo) List(ctx context.Context, userID string, filter entity.TaskFilter) ([]entity.Task, int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", ctx, userID, filter)
 	ret0, _ := ret[0].([]entity.Task)
@@ -371,4 +370,42 @@ func (m *MockGenreRepo) ListGenres(ctx context.Context) ([]entity.Genre, error) 
 func (mr *MockGenreRepoMockRecorder) ListGenres(ctx interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListGenres", reflect.TypeOf((*MockGenreRepo)(nil).ListGenres), ctx)
+}
+
+// MockLanguageRepo is a mock of LanguageRepo interface.
+type MockLanguageRepo struct {
+	ctrl     *gomock.Controller
+	recorder *MockLanguageRepoMockRecorder
+}
+
+// MockLanguageRepoMockRecorder is the mock recorder for MockLanguageRepo.
+type MockLanguageRepoMockRecorder struct {
+	mock *MockLanguageRepo
+}
+
+// NewMockLanguageRepo creates a new mock instance.
+func NewMockLanguageRepo(ctrl *gomock.Controller) *MockLanguageRepo {
+	mock := &MockLanguageRepo{ctrl: ctrl}
+	mock.recorder = &MockLanguageRepoMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockLanguageRepo) EXPECT() *MockLanguageRepoMockRecorder {
+	return m.recorder
+}
+
+// ListLanguages mocks base method.
+func (m *MockLanguageRepo) ListLanguages(ctx context.Context) ([]entity.Language, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListLanguages", ctx)
+	ret0, _ := ret[0].([]entity.Language)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListLanguages indicates an expected call of ListLanguages.
+func (mr *MockLanguageRepoMockRecorder) ListLanguages(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListLanguages", reflect.TypeOf((*MockLanguageRepo)(nil).ListLanguages), ctx)
 }

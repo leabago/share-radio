@@ -6,13 +6,24 @@ import (
 )
 
 type Genre struct {
-	Id   uuid.UUID
+	Id   string
 	Name string
 }
 
-func (g Genre) ConvertToHttpGenre() gen.Genre {
-	return gen.Genre{
-		Id:   new(g.Id),
+func (g *Genre) ConvertToHttpGenre() *gen.Genre {
+	id, _ := uuid.Parse(g.Id)
+
+	return &gen.Genre{
+		Id:   new(id),
 		Name: new(g.Name),
 	}
+}
+
+func ConvertToHttpGenreList(arr []Genre) []gen.Genre {
+	resp := make([]gen.Genre, len(arr))
+	for i, v := range arr {
+		resp[i] = *v.ConvertToHttpGenre()
+	}
+
+	return resp
 }

@@ -6,13 +6,24 @@ import (
 )
 
 type Language struct {
-	Id   uuid.UUID
+	Id   string
 	Name string
 }
 
-func (g Language) ConvertToHttpLanguage() gen.Language {
-	return gen.Language{
-		Id:   new(g.Id),
+func (g *Language) ConvertToHttpLanguage() *gen.Language {
+	id, _ := uuid.Parse(g.Id)
+
+	return &gen.Language{
+		Id:   new(id),
 		Name: new(g.Name),
 	}
+}
+
+func ConvertToHttpLanguageList(arr []Language) []gen.Language {
+	resp := make([]gen.Language, len(arr))
+	for i, v := range arr {
+		resp[i] = *v.ConvertToHttpLanguage()
+	}
+
+	return resp
 }

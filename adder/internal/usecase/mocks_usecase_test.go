@@ -286,10 +286,10 @@ func (mr *MockStationMockRecorder) CreateStation(ctx, request interface{}) *gomo
 }
 
 // GetStation mocks base method.
-func (m *MockStation) GetStation(ctx context.Context, request gen.GetStationRequestObject) (gen.StationDetail, error) {
+func (m *MockStation) GetStation(ctx context.Context, request gen.GetStationRequestObject) (gen.Station, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetStation", ctx, request)
-	ret0, _ := ret[0].(gen.StationDetail)
+	ret0, _ := ret[0].(gen.Station)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -377,10 +377,10 @@ func (m *MockLanguage) EXPECT() *MockLanguageMockRecorder {
 }
 
 // ListLanguages mocks base method.
-func (m *MockLanguage) ListLanguages(ctx context.Context, request gen.ListLanguagesRequestObject) (gen.ListLanguagesResponseObject, error) {
+func (m *MockLanguage) ListLanguages(ctx context.Context, request gen.ListLanguagesRequestObject) (gen.LanguageList, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListLanguages", ctx, request)
-	ret0, _ := ret[0].(gen.ListLanguagesResponseObject)
+	ret0, _ := ret[0].(gen.LanguageList)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

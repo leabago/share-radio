@@ -1,12 +1,15 @@
-CREATE TABLE IF NOT EXISTS genres (
+CREATE SCHEMA IF NOT EXISTS stations;
+
+CREATE TABLE IF NOT EXISTS stations.genres (
     id UUID PRIMARY KEY DEFAULT uuidv7(),
-    name VARCHAR(50) NOT NULL UNIQUE,
+    name VARCHAR(50),
     display_order INTEGER DEFAULT 0
     );
 
-CREATE INDEX idx_genres_display_order ON public.genres (display_order);
+CREATE INDEX idx_genres_display_order ON stations.genres (display_order);
+CREATE UNIQUE INDEX genres_name ON stations.genres (name);
 
-INSERT INTO public.genres (name, display_order) VALUES
+INSERT INTO stations.genres (name, display_order) VALUES
 ('pop', 1),
 ('rock', 2),
 ('hip hop', 3),
@@ -84,17 +87,19 @@ INSERT INTO public.genres (name, display_order) VALUES
 ('garage rock', 72),
 ('folk rock', 73),
 ('blues rock', 74),
-('southern rock', 75);
+('southern rock', 75),
+('other', 76);
 
-CREATE TABLE IF NOT EXISTS languages (
+CREATE TABLE IF NOT EXISTS stations.languages (
     id UUID PRIMARY KEY DEFAULT uuidv7(),
-    name VARCHAR(50) NOT NULL UNIQUE,
+    name VARCHAR(50),
     display_order INTEGER DEFAULT 0
     );
 
-CREATE INDEX idx_languages_display_order ON public.languages (display_order);
+CREATE INDEX idx_languages_display_order ON stations.languages (display_order);
+CREATE UNIQUE INDEX languages_name ON stations.languages (name);
 
-INSERT INTO public.languages (name, display_order) VALUES
+INSERT INTO stations.languages (name, display_order) VALUES
 ('English', 1),
 ('Spanish', 2),
 ('French', 3),
@@ -142,17 +147,23 @@ INSERT INTO public.languages (name, display_order) VALUES
 ('Latin', 45),
 ('Esperanto', 46),
 ('Multilingual', 47),
-('Other', 48);
+('other', 48);
 
-CREATE TABLE IF NOT EXISTS radio_stations (
+CREATE TABLE IF NOT EXISTS stations.radio_stations (
     id UUID PRIMARY KEY DEFAULT uuidv7(),
     name VARCHAR(100) NOT NULL,
     url VARCHAR(500) NOT NULL UNIQUE,
-    genre UUID REFERENCES genres(id),
-    language UUID REFERENCES languages(id),
+    genre UUID REFERENCES stations.genres(id) NOT NULL,
+    language UUID REFERENCES stations.languages(id) NOT NULL,
     icon VARCHAR(500),
+    description VARCHAR(500),
     is_active BOOLEAN DEFAULT false,
     is_new BOOLEAN DEFAULT true,
     added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
+
+CREATE INDEX radio_stations_is_active ON stations.radio_stations (is_active);
+CREATE INDEX radio_stations_genre ON stations.radio_stations (genre);
+CREATE INDEX radio_stations_language ON stations.radio_stations (language);
+CREATE UNIQUE INDEX radio_stations_name ON stations.radio_stations (name);

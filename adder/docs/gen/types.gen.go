@@ -47,11 +47,8 @@ func (e ListStationsParamsSortOrder) Valid() bool {
 
 // CreateStationRequest defines model for CreateStationRequest.
 type CreateStationRequest struct {
-	// Genre Example: rock
-	Genre string `json:"genre"`
-
-	// Language Example: Russian
-	Language *string `json:"language,omitempty"`
+	GenreId    openapi_types.UUID `json:"genreId"`
+	LanguageId openapi_types.UUID `json:"languageId"`
 
 	// Name Example: Rock FM
 	Name string `json:"name"`
@@ -72,11 +69,8 @@ type ErrorResponse struct {
 
 // Genre defines model for Genre.
 type Genre struct {
-	// Id Example: 550e8400-e29b-41d4-a716-446655440000
-	Id *openapi_types.UUID `json:"id,omitempty"`
-
-	// Name Example: rock
-	Name *string `json:"name,omitempty"`
+	Id   *openapi_types.UUID `json:"id,omitempty"`
+	Name *string             `json:"name,omitempty"`
 }
 
 // GenreList defines model for GenreList.
@@ -86,16 +80,25 @@ type GenreList struct {
 
 // Language defines model for Language.
 type Language struct {
-	// Id Example: 550e8400-e29b-41d4-a716-446655440000
-	Id *openapi_types.UUID `json:"id,omitempty"`
-
-	// Name Example: English
-	Name *string `json:"name,omitempty"`
+	Id   *openapi_types.UUID `json:"id,omitempty"`
+	Name *string             `json:"name,omitempty"`
 }
 
 // LanguageList defines model for LanguageList.
 type LanguageList struct {
 	Languages *[]Language `json:"languages,omitempty"`
+}
+
+// Pagination defines model for Pagination.
+type Pagination struct {
+	// Limit Example: 20
+	Limit *int `json:"limit,omitempty"`
+
+	// Offset Example: 0
+	Offset *int `json:"offset,omitempty"`
+
+	// Total Example: 42
+	Total *int `json:"total,omitempty"`
 }
 
 // PlayResponse defines model for PlayResponse.
@@ -149,9 +152,10 @@ type RecordPlayRequest struct {
 // Station defines model for Station.
 type Station struct {
 	// AddedAt Example: 2026-01-01T00:00:00Z
-	AddedAt *time.Time `json:"added_at,omitempty"`
+	AddedAt     *time.Time `json:"added_at,omitempty"`
+	Description *string    `json:"description,omitempty"`
 
-	// Genre Example: Rock
+	// Genre Example: pop
 	Genre *string `json:"genre,omitempty"`
 	Icon  *string `json:"icon,omitempty"`
 
@@ -164,64 +168,11 @@ type Station struct {
 	// IsNew Example: true
 	IsNew *bool `json:"is_new,omitempty"`
 
-	// Language Example: Russian
+	// Language Example: English
 	Language *string `json:"language,omitempty"`
 
 	// Name Example: Rock FM
 	Name *string `json:"name,omitempty"`
-
-	// UpdatedAt Example: 2026-01-01T00:00:00Z
-	UpdatedAt *time.Time `json:"updated_at,omitempty"`
-
-	// Url Example: https://radio.example.com/rockfm
-	Url *string `json:"url,omitempty"`
-}
-
-// StationDetail defines model for StationDetail.
-type StationDetail struct {
-	// AddedAt Example: 2026-01-01T00:00:00Z
-	AddedAt *time.Time `json:"added_at,omitempty"`
-
-	// Genre Example: Rock
-	Genre *string `json:"genre,omitempty"`
-	Icon  *string `json:"icon,omitempty"`
-
-	// Id Example: 550e8400-e29b-41d4-a716-446655440000
-	Id *openapi_types.UUID `json:"id,omitempty"`
-
-	// IsActive Example: true
-	IsActive *bool `json:"is_active,omitempty"`
-
-	// IsNew Example: true
-	IsNew *bool `json:"is_new,omitempty"`
-
-	// IsUserRated Example: false
-	IsUserRated *bool `json:"is_user_rated,omitempty"`
-
-	// Language Example: Russian
-	Language *string `json:"language,omitempty"`
-
-	// Name Example: Rock FM
-	Name *string `json:"name,omitempty"`
-
-	// RatingCount Example: 152
-	RatingCount        *int `json:"rating_count,omitempty"`
-	RatingDistribution *struct {
-		// N1 Example: 5
-		N1 *int `json:"1,omitempty"`
-
-		// N2 Example: 12
-		N2 *int `json:"2,omitempty"`
-
-		// N3 Example: 23
-		N3 *int `json:"3,omitempty"`
-
-		// N4 Example: 45
-		N4 *int `json:"4,omitempty"`
-
-		// N5 Example: 67
-		N5 *int `json:"5,omitempty"`
-	} `json:"rating_distribution,omitempty"`
 
 	// UpdatedAt Example: 2026-01-01T00:00:00Z
 	UpdatedAt *time.Time `json:"updated_at,omitempty"`
@@ -238,15 +189,8 @@ type StationId struct {
 
 // StationListResponse defines model for StationListResponse.
 type StationListResponse struct {
-	// Limit Example: 20
-	Limit *int `json:"limit,omitempty"`
-
-	// Offset Example: 0
-	Offset   *int       `json:"offset,omitempty"`
-	Stations *[]Station `json:"stations,omitempty"`
-
-	// Total Example: 42
-	Total *int `json:"total,omitempty"`
+	Pagination *Pagination `json:"pagination,omitempty"`
+	Stations   *[]Station  `json:"stations,omitempty"`
 }
 
 // UpdateStationRequest defines model for UpdateStationRequest.
@@ -281,11 +225,11 @@ type ListStationsParams struct {
 	// Offset Number of stations to skip
 	Offset *int `form:"offset,omitempty" json:"offset,omitempty"`
 
-	// Genre Filter by genre
-	Genre *string `form:"genre,omitempty" json:"genre,omitempty"`
+	// GenreId Filter by genreId
+	GenreId *openapi_types.UUID `form:"genreId,omitempty" json:"genreId,omitempty"`
 
-	// Language Filter by language
-	Language *string `form:"language,omitempty" json:"language,omitempty"`
+	// LanguageId Filter by languageId
+	LanguageId *openapi_types.UUID `form:"languageId,omitempty" json:"languageId,omitempty"`
 
 	// SortBy Sort results
 	SortBy *ListStationsParamsSortBy `form:"sort_by,omitempty" json:"sort_by,omitempty"`

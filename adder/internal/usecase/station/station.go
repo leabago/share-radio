@@ -52,39 +52,27 @@ func (sc *StationCase) ListStations(ctx context.Context, request gen.ListStation
 		return gen.StationListResponse{}, err
 	}
 
-	getStations := make([]gen.Station, len(stations))
-
-	for i, v := range stations {
-
-		station, err := v.ConvertToHttpStation()
-		if err != nil {
-			return gen.StationListResponse{}, err
-		}
-
-		getStations[i] = station
-	}
+	getStations := entity.ConvertToHttpStationList(stations)
 
 	resp := gen.StationListResponse{
 		Stations: new(getStations),
-
-		Limit:  request.Params.Limit,
-		Offset: request.Params.Offset,
-		Total:  new(len(getStations)),
+		Pagination: &gen.Pagination{
+			Limit:  request.Params.Limit,
+			Offset: request.Params.Offset,
+			Total:  new(len(getStations)),
+		},
 	}
 
 	return resp, nil
 }
 
-func (sc *StationCase) GetStation(ctx context.Context, request gen.GetStationRequestObject) (gen.StationDetail, error) {
+func (sc *StationCase) GetStation(ctx context.Context, request gen.GetStationRequestObject) (gen.Station, error) {
 	stationEntity, err := sc.repo.GetStation(ctx, request.Id.String())
 	if err != nil {
-		return gen.StationDetail{}, err
+		return gen.Station{}, err
 	}
 
-	station, err := stationEntity.ConvertToHttpStationDetail()
-	if err != nil {
-		return gen.StationDetail{}, err
-	}
+	station := stationEntity.ConvertToHttpStation()
 
-	return station, nil
+	return *station, nil
 }

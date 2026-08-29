@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/ansrivas/fiberprometheus/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/leabago/share-radio/adder/config"
 	"github.com/leabago/share-radio/adder/docs"
 	"github.com/leabago/share-radio/adder/docs/gen"
@@ -23,6 +24,10 @@ func NewRouter(app *fiber.App, cfg *config.Config,
 	// Options
 	app.Use(middleware.Logger(l))
 	app.Use(middleware.Recovery(l))
+	app.Use(cors.New(cors.Config{
+
+		AllowOrigins: "*",
+	}))
 
 	// Prometheus metrics
 	if cfg.Metrics.Enabled {
@@ -51,8 +56,5 @@ func NewRouter(app *fiber.App, cfg *config.Config,
 	bffController := api.NewController(station, genre, language)
 	wrappedHandler := gen.NewStrictHandler(bffController, nil)
 	gen.RegisterHandlers(app, wrappedHandler)
-
-	tasks := app.Group("tasks")
-	tasks.Use(middleware.Tasks)
 
 }

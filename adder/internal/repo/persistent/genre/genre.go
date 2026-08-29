@@ -10,8 +10,8 @@ import (
 )
 
 const selectGenres = `
-SELECT id, "name"
-FROM public.genres
+SELECT "id", "name"
+FROM stations.genres
 `
 
 type Repo struct {
@@ -30,7 +30,7 @@ func (r *Repo) ListGenres(ctx context.Context) ([]entity.Genre, error) {
 
 	selectGenresReq := selectGenres + order
 
-	row, err := r.Postgres.Pool.Query(
+	rows, err := r.Postgres.Pool.Query(
 		ctx,
 		selectGenresReq,
 	)
@@ -38,10 +38,36 @@ func (r *Repo) ListGenres(ctx context.Context) ([]entity.Genre, error) {
 		return nil, err
 	}
 
-	genre, err := pgx.CollectRows(row, pgx.RowToStructByName[entity.Genre])
+	genres, err := pgx.CollectRows(rows, pgx.RowToStructByName[entity.Genre])
 	if err != nil {
 		return nil, err
 	}
 
-	return genre, nil
+	return genres, nil
 }
+
+//func (r *Repo) GetGenreByName(ctx context.Context, name string) (*entity.Genre, error) {
+//
+//	where, args := sql_query.NewWhere().And("name = ?", name).SQL()
+//
+//	request := selectGenres + where
+//
+//	rows, err := r.Postgres.Pool.Query(
+//		ctx,
+//		request,
+//		args,
+//	)
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	genre, err := pgx.CollectOneRow(rows, pgx.RowToStructByName[entity.Genre])
+//	if err != nil {
+//		if errors.Is(err, pgx.ErrNoRows) {
+//			return nil, entity.ErrNotFound
+//		}
+//		return nil, err
+//	}
+//
+//	return &genre, nil
+//}

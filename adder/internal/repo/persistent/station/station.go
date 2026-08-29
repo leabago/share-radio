@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/leabago/share-radio/adder/docs/gen"
 	"github.com/leabago/share-radio/adder/internal/entity"
@@ -16,20 +15,22 @@ import (
 )
 
 const createStation = `
-INSERT INTO public.radio_stations
-(id, "name", url, genre, "language", added_at, updated_at)
-VALUES($1, $2, $3, $4, $5, $6, $7)
+INSERT INTO stations.radio_stations
+("name", url, genre, "language", added_at, updated_at)
+VALUES($1, $2, $3, $4, $5, $6)
 returning id;
 `
 
-const selectGenres = `
-SELECT id, "name", display_order
-FROM public.genres;
-`
-
 const selectStation = `
-SELECT id, "name", url, genre, "language", "icon", is_active, is_new, added_at, updated_at
-FROM public.radio_stations
+SELECT radio_stations."id", radio_stations."name", radio_stations."url", 
+genres."name" as genre_name, languages."name" language_name, radio_stations."icon", 
+radio_stations."is_active", radio_stations."is_new", 
+radio_stations."added_at", radio_stations."updated_at"
+FROM stations.radio_stations
+LEFT JOIN stations.genres 
+ON radio_stations.genre = stations.genres.id
+LEFT JOIN stations.languages
+ON radio_stations.language = stations.languages.id
 `
 
 var errStationNotFound = errors.New("station not found")
@@ -46,19 +47,13 @@ func New(pg *postgres.Postgres) *Repo {
 
 func (r *Repo) CreateStation(ctx context.Context, task *entity.Station) (string, error) {
 
-	id, err := uuid.NewUUID()
-	if err != nil {
-		return "", err
-	}
-
 	row, err := r.Postgres.Pool.Query(
 		ctx,
 		createStation,
-		id.String(),
 		task.Name,
 		task.Url,
-		task.Genre,
-		task.Language,
+		task.GenreId,
+		task.LanguageId,
 		time.Now(),
 		time.Now(),
 	)
@@ -79,26 +74,29 @@ func (r *Repo) ListStations(ctx context.Context, request gen.ListStationsRequest
 	// Where
 	where := sql_query.NewWhere()
 
-	where.And(`is_active = true`)
+	where.And(`radio_stations."is_active" = true`)
 
-	if request.Params.Genre != nil {
+	if request.Params.GenreId != nil {
 
-		where.And(`genre = ?`, *request.Params.Genre)
+		where.And(`radio_stations."genre" = ?`, request.Params.GenreId.String())
 	}
 
-	if request.Params.Language != nil {
-		where.And(`"language" = ?`, *request.Params.Language)
+	if request.Params.LanguageId != nil {
+
+		where.And(`radio_stations."language" = ?`, request.Params.LanguageId.String())
 	}
 
 	if request.Params.Search != nil {
-		where.And(`name ILIKE ?`, "%"+*request.Params.Search+"%")
+		where.And(`radio_stations."name" ILIKE ?`, "%"+*request.Params.Search+"%")
 	}
 
 	whereSql, args := where.SQL()
 
 	// Pagination
 
-	paginationSql := sql_query.NewPagination().Take(functions.GetDefaultValue(request.Params.Limit)).Skip(functions.GetDefaultValue(request.Params.Offset)).SQL()
+	paginationSql := sql_query.NewPagination().
+		Take(functions.GetDefaultValue(request.Params.Limit)).
+		Skip(functions.GetDefaultValue(request.Params.Offset)).SQL()
 
 	// Order
 	orderSql := ""
@@ -150,7 +148,9 @@ func (r *Repo) ListStations(ctx context.Context, request gen.ListStationsRequest
 
 func (r *Repo) GetStation(ctx context.Context, id string) (entity.Station, error) {
 
-	whereSql, args := sql_query.NewWhere().And(`id = ?`, id).SQL()
+	whereSql, args := sql_query.NewWhere().
+		And(`radio_stations."id" = ?`, id).
+		And(`radio_stations."is_active" = true`).SQL()
 
 	sqlRequest := selectStation + whereSql
 

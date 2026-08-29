@@ -37,18 +37,18 @@ paths:
             type: integer
             minimum: 0
             default: 0
-        - name: genre
+        - name: genreId
           in: query
-          description: Filter by genre
+          description: Filter by genreId
           schema:
             type: string
-            example: rock
-        - name: language
+            format: uuid
+        - name: languageId
           in: query
-          description: Filter by language
+          description: Filter by languageId
           schema:
             type: string
-            example: Russian
+            format: uuid
         - name: sort_by
           in: query
           description: Sort results
@@ -137,7 +137,7 @@ paths:
       tags:
         - stations
       summary: Get radio station
-      description: Get a radio station by its UUID (Public - no auth required)
+      description: Get a radio station by id
       operationId: getStation
       security: []  # No authentication required
       parameters:
@@ -155,7 +155,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StationDetail'
+                $ref: '#/components/schemas/Station'
         '404':
           description: Station not found
           content:
@@ -513,73 +513,6 @@ paths:
 
 components:
   schemas:
-    AdminUser:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          example: 550e8400-e29b-41d4-a716-446655440000
-        username:
-          type: string
-          example: admin
-        email:
-          type: string
-          format: email
-          example: admin@radioapp.com
-        created_at:
-          type: string
-          format: date-time
-          example: 2026-01-01T00:00:00Z
-
-    RegisterRequest:
-      type: object
-      required:
-        - username
-        - email
-        - password
-      properties:
-        username:
-          type: string
-          minLength: 3
-          maxLength: 50
-          pattern: '^[a-zA-Z0-9_]+$'
-          example: admin
-        email:
-          type: string
-          format: email
-          example: admin@radioapp.com
-        password:
-          type: string
-          minLength: 6
-          maxLength: 100
-          example: securePassword123
-
-    LoginRequest:
-      type: object
-      required:
-        - username
-        - password
-      properties:
-        username:
-          type: string
-          example: admin
-        password:
-          type: string
-          example: securePassword123
-
-    AuthResponse:
-      type: object
-      properties:
-        token:
-          type: string
-          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-        user:
-          $ref: '#/components/schemas/AdminUser'
-        expires_at:
-          type: string
-          format: date-time
-          example: 2026-01-02T00:00:00Z
 
     Station:
       type: object
@@ -597,10 +530,12 @@ components:
           example: https://radio.example.com/rockfm
         genre:
           type: string
-          example: Rock
+          example: pop
         language:
           type: string
-          example: Russian
+          example: English
+        description:
+          type: string
         icon:
           type: string
         is_active:
@@ -626,42 +561,18 @@ components:
           format: uuid
           example: 550e8400-e29b-41d4-a716-446655440000
 
-    StationDetail:
-      allOf:
-        - $ref: '#/components/schemas/Station'
-        - type: object
-          properties:
-            rating_distribution:
-              type: object
-              properties:
-                '1':
-                  type: integer
-                  example: 5
-                '2':
-                  type: integer
-                  example: 12
-                '3':
-                  type: integer
-                  example: 23
-                '4':
-                  type: integer
-                  example: 45
-                '5':
-                  type: integer
-                  example: 67
-            rating_count:
-              type: integer
-              example: 152
-            is_user_rated:
-              type: boolean
-              example: false
+#    StationDetail:
+#      allOf:
+#        - $ref: '#/components/schemas/Station'
+#        - type: object
 
     CreateStationRequest:
       type: object
       required:
         - name
         - url
-        - genre
+        - genreId
+        - languageId
       properties:
         name:
           type: string
@@ -674,15 +585,12 @@ components:
           minLength: 1
           maxLength: 500
           example: https://radio.example.com/rockfm
-        genre:
+        genreId:
           type: string
-          minLength: 1
-          maxLength: 50
-          example: rock
-        language:
+          format: uuid
+        languageId:
           type: string
-          maxLength: 50
-          example: Russian
+          format: uuid
 
     UpdateStationRequest:
       type: object
@@ -796,6 +704,12 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Station'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    Pagination:
+      type: object
+      properties:
         total:
           type: integer
           example: 42
@@ -806,17 +720,6 @@ components:
           type: integer
           example: 0
 
-    Genre:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          example: 550e8400-e29b-41d4-a716-446655440000
-        name:
-          type: string
-          example: rock
-
     GenreList:
       type: object
       properties:
@@ -825,16 +728,14 @@ components:
           items:
             $ref: '#/components/schemas/Genre'
 
-    Language:
+    Genre:
       type: object
       properties:
         id:
           type: string
           format: uuid
-          example: 550e8400-e29b-41d4-a716-446655440000
         name:
           type: string
-          example: English
 
     LanguageList:
       type: object
@@ -843,6 +744,16 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Language'
+
+    Language:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+
 
     ErrorResponse:
       type: object
