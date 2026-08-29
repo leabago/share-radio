@@ -14,13 +14,11 @@ import (
 	"github.com/gofiber/contrib/swagger"
 	"github.com/gofiber/fiber/v2"
 	"github.com/leabago/share-radio/adder/internal/usecase"
-	"github.com/leabago/share-radio/adder/pkg/jwt"
 	"github.com/leabago/share-radio/adder/pkg/logger"
 )
 
 func NewRouter(app *fiber.App, cfg *config.Config,
-	station usecase.Station, genre usecase.Genre, language usecase.Language,
-	jwtManager *jwt.Manager, l logger.Interface) {
+	station usecase.Station, genre usecase.Genre, language usecase.Language, l logger.Interface) {
 	// Options
 	app.Use(middleware.Logger(l))
 	app.Use(middleware.Recovery(l))

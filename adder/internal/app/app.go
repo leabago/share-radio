@@ -106,7 +106,7 @@ func initServers(cfg *config.Config, uc useCases, jwtManager *jwt.Manager, l log
 
 	// HTTP Server
 	httpServer := httpserver.New(l, httpserver.Port(cfg.HTTP.Port), httpserver.Prefork(cfg.HTTP.UsePreforkMode))
-	http_api.NewRouter(httpServer.App, cfg, uc.station, uc.genre, uc.language, jwtManager, l)
+	http_api.NewRouter(httpServer.App, cfg, uc.station, uc.genre, uc.language, l)
 
 	return servers{
 		rmq:  rmqServer,
